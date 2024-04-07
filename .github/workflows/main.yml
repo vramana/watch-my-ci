@@ -25,7 +25,6 @@ jobs:
         run: pnpm i
         working-directory: web
 
-
       - name: ESLint
         run: pnpm lint
         working-directory: web
