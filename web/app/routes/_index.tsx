@@ -19,9 +19,17 @@ export const loader = async () => {
   });
 
   const workflows = await octokit.rest.actions.listRepoWorkflows({
+    owner: "nodejs",
+    repo: "node",
+  });
+
+  const jobs = await octokit.rest.actions.listJobsForWorkflowRun({
     owner: "vramana",
     repo: "watch-my-ci",
+    run_id: runs.data.workflow_runs[0].id,
   });
+
+  console.log(runs.data.workflow_runs[0]);
   return json({ user: user.data, runs: runs.data, workflows: workflows.data });
 };
 
