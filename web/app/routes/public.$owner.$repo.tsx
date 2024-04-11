@@ -4,7 +4,7 @@ import { json, type MetaFunction } from "@remix-run/node";
 import { Form } from "@remix-run/react";
 import { useLoaderData, useActionData } from "@remix-run/react";
 import { Octokit } from "@octokit/rest";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigation } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
@@ -27,27 +27,28 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         repo: repo,
       });
 
-      await Promise.all(
-        workflows.data.workflows.map(async (workflow) => {
-          const existingWorkflow = await prisma.workflow.findFirst({
-            where: {
-              id: workflow.id,
-            },
-          });
-          console.log("existingWorkflow", existingWorkflow);
-          if (!existingWorkflow) {
-            const newWorkflow = await prisma.workflow.create({
-              data: {
-                id: workflow.id,
-                repo: owner + "/" + repo,
-                name: workflow.name,
-                path: workflow.path,
-              },
-            });
-          }
-        }),
-      );
-      return { message: "sync done" };
+      const existingWorkflows = await prisma.workflow.findMany({
+        where: {
+          repo: owner + "/" + repo,
+        },
+      });
+
+      const newWorkflows = workflows.data.workflows
+        .filter(
+          (workflow) => !existingWorkflows.some((w) => w.id === workflow.id),
+        )
+        .map((w) => {
+          return {
+            id: w.id,
+            repo: owner + "/" + repo,
+            name: w.name,
+            path: w.path,
+          };
+        });
+      await prisma.workflow.createMany({
+        data: newWorkflows,
+      });
+      return { message: `${newWorkflows.length} item/items synced` };
     } else {
       return { message: "Invalid owner or repo provided." };
     }
