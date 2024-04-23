@@ -23,13 +23,22 @@ export const loader = async () => {
     repo: "node",
   });
 
+  octokit
+    .paginate(octokit.rest.actions.listWorkflowRunsForRepo, {
+      owner: "vramana",
+      repo: "watch-my-ci",
+    })
+    .then((issues) => {
+      console.log("issues------>", issues);
+      // issues is an array of all issue objects
+    });
+
   const jobs = await octokit.rest.actions.listJobsForWorkflowRun({
     owner: "vramana",
     repo: "watch-my-ci",
     run_id: runs.data.workflow_runs[0].id,
   });
 
-  console.log(runs.data.workflow_runs[0]);
   return json({ user: user.data, runs: runs.data, workflows: workflows.data });
 };
 

@@ -18,6 +18,12 @@ model workflow {
   repo  String  
   name  String  
   path  String 
+}
 
-  
+model workflowRun {
+  id          BigInt    @unique
+  duration    Int
+  success     Boolean 
+  workflowId  Int
+  repo        String
 }

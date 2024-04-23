@@ -10,16 +10,14 @@
     "start": "remix-serve ./build/server/index.js",
     "typecheck": "tsc"
   },
-  "prettier" : {
-
-  },
+  "prettier": {},
   "dependencies": {
-
     "@octokit/rest": "^20.1.0",
     "@prisma/client": "5.12.1",
     "@remix-run/node": "^2.8.1",
     "@remix-run/react": "^2.8.1",
     "@remix-run/serve": "^2.8.1",
+    "dayjs": "^1.11.10",
     "isbot": "^4.1.0",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
