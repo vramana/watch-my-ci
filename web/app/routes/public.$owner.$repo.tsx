@@ -6,6 +6,16 @@ import { useLoaderData, useActionData } from "@remix-run/react";
 import { Octokit } from "@octokit/rest";
 import { useEffect } from "react";
 import { useNavigation } from "@remix-run/react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 import dayjs from "dayjs";
 
 export const meta: MetaFunction = () => {
@@ -15,13 +25,7 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-function run(a: { y: number }) {
-  console.log(a.y);
-}
-
 export const action = async ({ request }: ActionFunctionArgs) => {
-  console.log("hello0");
-
   const body = await request.formData();
   const repo = body.get("repo");
   const owner = body.get("owner");
@@ -107,6 +111,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
             return {
               id: r.id,
               duration: (end.valueOf() - start.valueOf()) / 1000,
+              startedAt: r.run_started_at,
               success: r.conclusion === "success" ? true : false,
               repo: owner + "/" + repo,
               workflowId: r.workflow_id,
@@ -116,10 +121,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         const run = await prisma.workflowRun.createMany({
           data: newWorkflowRuns,
         });
-        console.log("run", run);
         return newWorkflowRuns;
       };
-      console.log("hello");
       const newWorkflows = await syncWorkflows({ owner, repo, workflows });
       const newRuns = await syncRuns({ owner, repo, runs });
       return {
@@ -140,7 +143,21 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
 
-  return json({ owner: params.owner, repo: params.repo, workflows: workflows });
+  let workflowruns = await prisma.workflowRun.findMany({
+    where: {
+      repo: params.owner + "/" + params.repo,
+    },
+  });
+  workflowruns = workflowruns.map((run: any) => {
+    return { ...run, id: Number(run.id) };
+  });
+
+  return json({
+    owner: params.owner,
+    repo: params.repo,
+    workflows: workflows,
+    workflowruns,
+  });
 };
 
 export default function GetWorkflow() {
@@ -152,6 +169,12 @@ export default function GetWorkflow() {
       alert(sucess.message);
     }
   }, [state]);
+  const chartData = data.workflowruns.map((d: any) => {
+    return {
+      name: dayjs(d.startedAt).format("DD/MM/YYYY"),
+      duration: d.duration,
+    };
+  });
   return (
     <>
       <h3>List of workflows</h3>
@@ -172,6 +195,19 @@ export default function GetWorkflow() {
           );
         })}
       </ul>
+      <LineChart width={1000} height={500} data={chartData}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="name" />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Line
+          type="monotone"
+          dataKey="duration"
+          stroke="#8884d8"
+          activeDot={{ r: 8 }}
+        />
+      </LineChart>
     </>
   );
 }

@@ -22,6 +22,7 @@ model workflow {
 
 model workflowRun {
   id          BigInt    @unique
+  startedAt   DateTime
   duration    Int
   success     Boolean 
   workflowId  Int
