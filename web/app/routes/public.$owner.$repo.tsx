@@ -14,8 +14,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer,
 } from "recharts";
+import _ from "lodash";
 import dayjs from "dayjs";
 
 export const meta: MetaFunction = () => {
@@ -147,6 +147,9 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     where: {
       repo: params.owner + "/" + params.repo,
     },
+    orderBy: {
+      startedAt: "asc",
+    },
   });
   workflowruns = workflowruns.map((run: any) => {
     return { ...run, id: Number(run.id) };
@@ -169,12 +172,9 @@ export default function GetWorkflow() {
       alert(sucess.message);
     }
   }, [state]);
-  const chartData = data.workflowruns.map((d: any) => {
-    return {
-      name: dayjs(d.startedAt).format("DD/MM/YYYY"),
-      duration: d.duration,
-    };
-  });
+
+  const groupByData = _.groupBy(data.workflowruns, "workflowId");
+
   return (
     <>
       <h3>List of workflows</h3>
@@ -188,26 +188,35 @@ export default function GetWorkflow() {
       </Form>
       <ul>
         {data.workflows.map((w) => {
+          const id = w.id;
+          const chartData = groupByData[id].map((d: any) => {
+            return {
+              name: dayjs(d.startedAt).format("DD/MM/YYYY"),
+              duration: d.duration,
+            };
+          });
           return (
             <li key={w.id}>
-              {w.name} - {w.path}
+              <h3>
+                {w.name} - {w.path}
+              </h3>
+              <LineChart width={1000} height={500} data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="duration"
+                  stroke="#8884d8"
+                  activeDot={{ r: 8 }}
+                />
+              </LineChart>
             </li>
           );
         })}
       </ul>
-      <LineChart width={1000} height={500} data={chartData}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Line
-          type="monotone"
-          dataKey="duration"
-          stroke="#8884d8"
-          activeDot={{ r: 8 }}
-        />
-      </LineChart>
     </>
   );
 }

@@ -22,9 +22,12 @@ model workflow {
 
 model workflowRun {
   id          BigInt    @unique
-  startedAt   DateTime
+  startedAt   DateTime 
   duration    Int
   success     Boolean 
   workflowId  Int
   repo        String
+
+
+  @@index([startedAt])
 }
