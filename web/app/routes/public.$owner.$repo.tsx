@@ -74,15 +74,28 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       };
 
       const date = dayjs().subtract(3, "month").format("YYYY-MM-DD");
-      const runs = await octokit.paginate(
+
+      const iterator = octokit.paginate.iterator(
         octokit.rest.actions.listWorkflowRunsForRepo,
         {
           owner: owner,
           repo: repo,
-          created: ">=" + date,
+          per_page: 100,
         },
       );
-
+      let runs = [];
+      for await (const res of iterator) {
+        let data = Object.values(res.data);
+        data = data.filter(
+          (run) =>
+            dayjs(run.run_started_at).isAfter(dayjs().subtract(1, "month")) &&
+            typeof run === "object",
+        );
+        if (data.length === 0) {
+          break;
+        }
+        runs.push(...data);
+      }
       type Runs = typeof runs;
 
       const syncRuns = async ({
@@ -103,7 +116,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         const newWorkflowRuns = runs
           .filter(
             (run) =>
-              !existingRuns.some((w: any) => w.workflowId === run.workflow_id),
+              !existingRuns.some((w: any) => Number(w.id) === Number(run.id)),
           )
           .map((r: any) => {
             const start = new Date(r.run_started_at);
@@ -189,7 +202,7 @@ export default function GetWorkflow() {
       <ul>
         {data.workflows.map((w) => {
           const id = w.id;
-          const chartData = groupByData[id].map((d: any) => {
+          const chartData = groupByData[id]?.map((d: any) => {
             return {
               name: dayjs(d.startedAt).format("DD/MM/YYYY"),
               duration: d.duration,
