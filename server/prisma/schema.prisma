@@ -31,3 +31,10 @@ model workflowRun {
 
   @@index([startedAt])
 }
+
+
+model repo {
+  repo                String      @unique
+  workflowsSyncDate   DateTime?
+  runsSyncDate        DateTime?
+}

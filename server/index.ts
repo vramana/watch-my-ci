@@ -51,6 +51,32 @@ const syncWorkflowsHandler = async (job:any) => {
   await prisma.workflow.createMany({
     data: newWorkflows,
   });
+  const isRepoAvailable = await prisma.repo.findMany({
+    where:{
+      repo: owner + "/" + repo
+    }
+  })
+  if (isRepoAvailable.length === 0) {
+    console.log("creating")
+   
+    await prisma.repo.create({
+      data:{
+        repo: owner + "/" + repo,
+        workflowsSyncDate: dayjs().toISOString()
+      }
+    })
+  } else {
+    console.log("updating")
+    await prisma.repo.update({
+      where: {
+        repo: owner + "/" + repo,
+      },
+      data: {
+        workflowsSyncDate: dayjs().toISOString()
+
+      },
+    })
+  }
   return newWorkflows;
   }
 const syncWorkflowRunsHandler = async (job:any) => {
@@ -69,7 +95,7 @@ const syncWorkflowRunsHandler = async (job:any) => {
     let data = Object.values(res.data);
     data = data.filter(
       (run) =>
-        dayjs(run.run_started_at).isAfter(dayjs().subtract(3, "month")) &&
+        dayjs(run.run_started_at).isAfter(dayjs().subtract(3, "day")) &&
         typeof run === "object",
     );
     console.log("data", data.length);
@@ -106,6 +132,32 @@ const syncWorkflowRunsHandler = async (job:any) => {
   const run = await prisma.workflowRun.createMany({
     data: newWorkflowRuns,
   });
+  const isRepoAvailable = await prisma.repo.findMany({
+    where:{
+      repo: owner + "/" + repo
+    }
+  })
+  if (isRepoAvailable.length === 0) {
+    console.log("creating")
+   
+    await prisma.repo.create({
+      data:{
+        repo: owner + "/" + repo,
+        runsSyncDate: dayjs().toISOString()
+      }
+    })
+  } else {
+    console.log("updating")
+    await prisma.repo.update({
+      where: {
+        repo: owner + "/" + repo,
+      },
+      data: {
+        runsSyncDate: dayjs().toISOString()
+
+      },
+    })
+  }
   return newWorkflowRuns;
 
 }
