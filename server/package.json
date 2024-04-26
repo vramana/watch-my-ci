@@ -1,0 +1,29 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@octokit/rest": "^20.1.0",
+    "@prisma/client": "^5.13.0",
+    "@trpc/client": "11.0.0-rc.354",
+    "@trpc/server": "11.0.0-rc.354",
+    "dayjs": "^1.11.10",
+    "dotenv": "^16.4.5",
+    "lodash": "^4.17.21",
+    "pg-boss": "^9.0.3",
+    "prisma": "^5.13.0",
+    "zod": "^3.23.4"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.0",
+    "@types/node": "^20.12.7"
+  }
+}
