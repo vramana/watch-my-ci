@@ -55,6 +55,25 @@ export default function GetWorkflow() {
 
   const groupByData = _.groupBy(data.workflowruns, "workflowId");
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const workflows = await axios.post(
+        "http://localhost:3000/workflowsCreate",
+        {
+          owner: data.owner,
+          repo: data.repo,
+        },
+      );
+      console.log("workflows", workflows);
+      await axios.post("http://localhost:3000/workflowrunsCreate", {
+        owner: data.owner,
+        repo: data.repo,
+      });
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <>
       <h3>List of workflows</h3>
