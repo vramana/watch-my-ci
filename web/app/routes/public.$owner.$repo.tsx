@@ -73,8 +73,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         return newWorkflows;
       };
 
-      const date = dayjs().subtract(3, "month").format("YYYY-MM-DD");
-
       const iterator = octokit.paginate.iterator(
         octokit.rest.actions.listWorkflowRunsForRepo,
         {
@@ -88,14 +86,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         let data = Object.values(res.data);
         data = data.filter(
           (run) =>
-            dayjs(run.run_started_at).isAfter(dayjs().subtract(1, "month")) &&
+            dayjs(run.run_started_at).isAfter(dayjs().subtract(3, "day")) &&
             typeof run === "object",
         );
+        console.log("data", data.length);
         if (data.length === 0) {
           break;
         }
         runs.push(...data);
       }
+
+      console.log("runs", runs.length);
       type Runs = typeof runs;
 
       const syncRuns = async ({

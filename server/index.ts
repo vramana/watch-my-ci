@@ -26,6 +26,12 @@ const workflowRunQueue = "workflowRunQueue"
 const syncWorkflowsHandler = async (job:any) => {
   const  owner =job.data.owner;
   const repo= job.data.repo;
+  const lastSyncDate = await prisma.repo.findMany({
+    where: {
+      repo: owner + "/" + repo
+    }
+  })
+  console.log("lastSyncDate",lastSyncDate)
   const workflows = await octokit.rest.actions.listRepoWorkflows({
    owner,
    repo
