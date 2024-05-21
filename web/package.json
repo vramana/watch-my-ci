@@ -17,6 +17,7 @@
     "@remix-run/node": "^2.8.1",
     "@remix-run/react": "^2.8.1",
     "@remix-run/serve": "^2.8.1",
+    "axios": "^1.6.8",
     "dayjs": "^1.11.10",
     "isbot": "^4.1.0",
     "lodash": "^4.17.21",
