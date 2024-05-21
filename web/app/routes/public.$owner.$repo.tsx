@@ -2,7 +2,7 @@ import { prisma } from "../server/prisma.server";
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, type MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   LineChart,
@@ -52,8 +52,15 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
 
 export default function GetWorkflow() {
   const data = useLoaderData<typeof loader>();
+  const [id, setId] = useState("");
 
   const groupByData = _.groupBy(data.workflowruns, "workflowId");
+  const chartData = groupByData[id]?.map((d: any) => {
+    return {
+      name: dayjs(d.startedAt).format("DD/MM/YYYY"),
+      duration: d.duration,
+    };
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,39 +83,54 @@ export default function GetWorkflow() {
 
   return (
     <>
-      <h3>List of workflows</h3>
+      <h4>List of repos</h4>
       <button onClick={() => window.location.reload()}>refresh</button>
-      <ul>
-        {data.workflows.map((w) => {
-          const id = w.id;
-          const chartData = groupByData[id]?.map((d: any) => {
-            return {
-              name: dayjs(d.startedAt).format("DD/MM/YYYY"),
-              duration: d.duration,
-            };
-          });
-          return (
-            <li key={w.id}>
-              <h3>
-                {w.name} - {w.path}
-              </h3>
-              <LineChart width={1000} height={500} data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="duration"
-                  stroke="#8884d8"
-                  activeDot={{ r: 8 }}
-                />
-              </LineChart>
-            </li>
-          );
-        })}
-      </ul>
+
+      <div className="flex flex-row">
+        <table className="w-full text-sm text-left rtl:text-right text-gray-900 basis-1/2    ">
+          <thead className="text-xs text-gray-100 uppercase bg-gray-800">
+            <tr>
+              <th scope="col" className="px-6 py-3">
+                Repo
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Avg. Time
+              </th>
+              <th scope="col" className="px-6 py-3">
+                Show Graph
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.workflows.map((w) => {
+              return (
+                <tr key={w.id} className="bg-white border-b-2 ">
+                  <td className="px-6 py-4">{w.name}</td>
+                  <td className="px-6 py-4 "></td>
+                  <td className="px-6 py-4 ">
+                    <button onClick={() => setId(w.id)}>show</button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <div className="basis-1/2">
+          <LineChart width={700} height={500} data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Line
+              type="monotone"
+              dataKey="duration"
+              stroke="#8884d8"
+              activeDot={{ r: 8 }}
+            />
+          </LineChart>
+        </div>
+      </div>
     </>
   );
 }
