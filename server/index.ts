@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { Octokit } from "@octokit/rest";
 import _ from "lodash";
 import dayjs from "dayjs";
+import cors from 'cors';
 
 
 dotenv.config()
@@ -83,6 +84,7 @@ const syncWorkflowsHandler = async (job:any) => {
       },
     })
   }
+  console.log("workflows done")
   return newWorkflows;
   }
 const syncWorkflowRunsHandler = async (job:any) => {
@@ -164,6 +166,7 @@ const syncWorkflowRunsHandler = async (job:any) => {
       },
     })
   }
+  console.log("runs done")
   return newWorkflowRuns;
 
 }
@@ -202,6 +205,7 @@ export type AppRouter = typeof appRouter;
 
 
 createHTTPServer({
+  middleware: cors(),
     router: appRouter,
     createContext() {
       console.log('context 3');
