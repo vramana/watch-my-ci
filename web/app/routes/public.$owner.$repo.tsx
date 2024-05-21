@@ -87,36 +87,38 @@ export default function GetWorkflow() {
       <button onClick={() => window.location.reload()}>refresh</button>
 
       <div className="flex flex-row">
-        <table className="w-full text-sm text-left rtl:text-right text-gray-900 basis-1/2    ">
-          <thead className="text-xs text-gray-100 uppercase bg-gray-800">
-            <tr>
-              <th scope="col" className="px-6 py-3">
-                Repo
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Avg. Time
-              </th>
-              <th scope="col" className="px-6 py-3">
-                Show Graph
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.workflows.map((w) => {
-              return (
-                <tr key={w.id} className="bg-white border-b-2 ">
-                  <td className="px-6 py-4">{w.name}</td>
-                  <td className="px-6 py-4 "></td>
-                  <td className="px-6 py-4 ">
-                    <button onClick={() => setId(w.id)}>show</button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="basis-1/2 overflow-y-auto h-[80vh]">
+          <table className="w-full text-sm text-left rtl:text-right text-gray-900    ">
+            <thead className="text-xs text-gray-100 uppercase bg-gray-800">
+              <tr>
+                <th scope="col" className="px-6 py-3">
+                  Repo
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Avg. Time
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Show Graph
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.workflows.map((w) => {
+                return (
+                  <tr key={w.id} className="bg-white border-b-2 ">
+                    <td className="px-6 py-4">{w.name}</td>
+                    <td className="px-6 py-4 "></td>
+                    <td className="px-6 py-4 ">
+                      <button onClick={() => setId(w.id)}>show</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
         <div className="basis-1/2">
-          <LineChart width={700} height={500} data={chartData}>
+          <LineChart width={700} height={600} data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis />
