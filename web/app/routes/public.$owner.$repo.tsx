@@ -76,15 +76,15 @@ export default function GetWorkflow() {
         owner: data.owner,
         repo: data.repo,
       });
+      setId(data.workflows[0].id);
     };
 
     fetchData();
   }, []);
 
   return (
-    <>
-      <h4>List of repos</h4>
-      <button onClick={() => window.location.reload()}>refresh</button>
+    <div className="pt-10">
+      {/* <button onClick={() => window.location.reload()}>refresh</button> */}
 
       <div className="flex flex-row">
         <div className="basis-1/2 overflow-y-auto h-[80vh]">
@@ -117,8 +117,11 @@ export default function GetWorkflow() {
             </tbody>
           </table>
         </div>
-        <div className="basis-1/2">
-          <LineChart width={700} height={600} data={chartData}>
+        <div className="basis-1/2 mr-4">
+          <h4 className="text-center text-3xl font-bold my-6">
+            {data.workflows.find((w) => w.id === id)?.name || ""}
+          </h4>
+          <LineChart width={700} height={550} data={chartData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis />
@@ -133,6 +136,6 @@ export default function GetWorkflow() {
           </LineChart>
         </div>
       </div>
-    </>
+    </div>
   );
 }
