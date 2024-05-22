@@ -5,8 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "pnpm nodemon -x 'pnpm tsx index.js' -e ts"
   },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -19,8 +21,10 @@
     "dayjs": "^1.11.10",
     "dotenv": "^16.4.5",
     "lodash": "^4.17.21",
+    "nodemon": "^3.1.0",
     "pg-boss": "^9.0.3",
     "prisma": "^5.13.0",
+    "tsx": "^4.10.5",
     "zod": "^3.23.4"
   },
   "devDependencies": {
