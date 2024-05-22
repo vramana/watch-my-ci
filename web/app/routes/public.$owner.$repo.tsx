@@ -24,6 +24,11 @@ export const meta: MetaFunction = () => {
 };
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
+  const repoData = await prisma.repo.findFirst({
+    where: {
+      repo: params.owner + "/" + params.repo,
+    },
+  });
   const workflows = await prisma.workflow.findMany({
     where: {
       repo: params.owner + "/" + params.repo,
@@ -47,6 +52,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     repo: params.repo,
     workflows,
     workflowruns,
+    repoData,
   });
 };
 
@@ -64,18 +70,18 @@ export default function GetWorkflow() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const workflows = await axios.post(
-        "http://localhost:3000/workflowsCreate",
-        {
+      if (dayjs().isSame(dayjs(data.repoData.workflowsSyncDate))) {
+        await axios.post("http://localhost:3000/workflowsCreate", {
           owner: data.owner,
           repo: data.repo,
-        },
-      );
-      console.log("workflows", workflows);
-      await axios.post("http://localhost:3000/workflowrunsCreate", {
-        owner: data.owner,
-        repo: data.repo,
-      });
+        });
+      }
+      if (dayjs().isSame(dayjs(data.repoData.runsSyncDate))) {
+        await axios.post("http://localhost:3000/workflowrunsCreate", {
+          owner: data.owner,
+          repo: data.repo,
+        });
+      }
       setId(data.workflows[0].id);
     };
 
