@@ -52,13 +52,17 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
     },
   });
   let groupByData = _.groupBy(lastTenDaysData, "workflowId");
+  let averageDurationData = {};
+  let activeWorkflows = [];
   for (let id in groupByData) {
     let sum = 0;
+    let workflow = workflows.find((r) => Number(r.id) === Number(id));
+    activeWorkflows.push(workflow);
     for (let i = 0; i < groupByData[id].length; i++) {
       sum += Number(groupByData[id][i].duration);
     }
     let avgDuration = (sum / groupByData[id].length).toFixed(2);
-    groupByData[id] = { avgDuration };
+    averageDurationData[id] = avgDuration;
   }
   workflowruns = workflowruns.map((run: any) => {
     return { ...run, id: Number(run.id) };
@@ -67,10 +71,10 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   return json({
     owner: params.owner,
     repo: params.repo,
-    workflows,
+    workflows: activeWorkflows,
     workflowruns,
     repoData,
-    avgDuration: groupByData,
+    avgDuration: averageDurationData,
   });
 };
 
@@ -141,9 +145,7 @@ export default function GetWorkflow() {
                         {w.name}
                       </a>
                     </td>
-                    <td className="px-6 py-4 ">
-                      {data.avgDuration[w.id]?.avgDuration}
-                    </td>
+                    <td className="px-6 py-4 ">{data.avgDuration[w.id]}</td>
                     <td className="px-6 py-4 ">
                       <button onClick={() => setId(w.id)}>show</button>
                     </td>
