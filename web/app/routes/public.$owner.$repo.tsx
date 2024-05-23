@@ -82,7 +82,7 @@ export default function GetWorkflow() {
   const chartData = groupByData[id]?.map((d: any) => {
     return {
       name: dayjs(d.startedAt).format("DD/MM/YYYY"),
-      duration: d.duration,
+      "duration(sec)": d.duration,
     };
   });
 
@@ -125,7 +125,7 @@ export default function GetWorkflow() {
                   Workflows
                 </th>
                 <th scope="col" className="px-6 py-3">
-                  Avg. Time
+                  Avg. Time(sec)
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Show Graph
@@ -165,7 +165,7 @@ export default function GetWorkflow() {
             <Legend />
             <Line
               type="monotone"
-              dataKey="duration"
+              dataKey="duration(sec)"
               stroke="#8884d8"
               activeDot={{ r: 8 }}
             />
