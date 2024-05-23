@@ -136,7 +136,11 @@ export default function GetWorkflow() {
               {data.workflows.map((w) => {
                 return (
                   <tr key={w.id} className="bg-white border-b-2 ">
-                    <td className="px-6 py-4">{w.name}</td>
+                    <td className="px-6 py-4">
+                      <a href={w.path} target="_blank">
+                        {w.name}
+                      </a>
+                    </td>
                     <td className="px-6 py-4 ">
                       {data.avgDuration[w.id]?.avgDuration}
                     </td>
