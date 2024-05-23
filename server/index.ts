@@ -145,13 +145,15 @@ duration = 30
       });
     console.log("newWorkflowRuns", newWorkflowRuns);
 
-    const run = await prisma.workflowRun.createMany({
+    await prisma.workflowRun.createMany({
       data: newWorkflowRuns,
     });
   
 
-    
-   
+
+
+
+
       await prisma.repo.update({
         where: {
           repo: owner + "/" + repo,
@@ -160,7 +162,7 @@ duration = 30
           runsSyncDate: dayjs().toISOString(),
         },
       });
-    return newWorkflowRuns;
+    return newWorkflowRuns
   } catch (err) {
     console.log(err);
   }
