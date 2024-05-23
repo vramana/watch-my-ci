@@ -104,7 +104,7 @@ export default function GetWorkflow() {
             <thead className="text-xs text-gray-100 uppercase bg-gray-800">
               <tr>
                 <th scope="col" className="px-6 py-3">
-                  Repo
+                  Workflows
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Avg. Time
