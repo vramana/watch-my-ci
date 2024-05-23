@@ -25,11 +25,7 @@ const workflowRunQueue = "workflowRunQueue";
 const syncWorkflowsHandler = async (job: any) => {
   const owner = job.data.owner;
   const repo = job.data.repo;
-  const lastSyncDate = await prisma.repo.findMany({
-    where: {
-      repo: owner + "/" + repo,
-    },
-  });
+
   try {
     const workflows = await octokit.rest.actions.listRepoWorkflows({
       owner,
@@ -89,6 +85,11 @@ const syncWorkflowRunsHandler = async (job: any) => {
   try {
     const owner = job.data.owner;
     const repo = job.data.repo;
+    const repoData = await prisma.repo.findMany({
+      where: {
+        repo: owner + "/" + repo,
+      },
+    });
     const iterator = octokit.paginate.iterator(
       octokit.rest.actions.listWorkflowRunsForRepo,
       {
@@ -98,11 +99,20 @@ const syncWorkflowRunsHandler = async (job: any) => {
       }
     );
     let runs = [];
+    let duration = 0
+      if (repoData.length === 0) {
+duration = 30
+  
+      } else {
+        let lastSyncDate = dayjs(repoData.runsSyncDate)
+        duration = dayjs().diff(lastSyncDate, 'day')
+      }
+      console.log({duration})
     for await (const res of iterator) {
       let data = Object.values(res.data);
       data = data.filter(
         (run) =>
-          dayjs(run.run_started_at).isAfter(dayjs().subtract(1, "month")) &&
+          dayjs(run.run_started_at).isAfter(dayjs().subtract(duration, "day")) &&
           typeof run === "object"
       );
       console.log("data", data.length);
@@ -138,12 +148,8 @@ const syncWorkflowRunsHandler = async (job: any) => {
     const run = await prisma.workflowRun.createMany({
       data: newWorkflowRuns,
     });
-    const isRepoAvailable = await prisma.repo.findMany({
-      where: {
-        repo: owner + "/" + repo,
-      },
-    });
-    if (isRepoAvailable.length === 0) {
+  
+    if (repoData.length === 0) {
 
       await prisma.repo.create({
         data: {

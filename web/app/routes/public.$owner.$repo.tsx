@@ -70,19 +70,25 @@ export default function GetWorkflow() {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (dayjs().isSame(dayjs(data.repoData.workflowsSyncDate))) {
+      if (
+        !data.repoData?.workflowsSyncDate ||
+        dayjs().isSame(dayjs(data.repoData?.workflowsSyncDate))
+      ) {
         await axios.post("http://localhost:3000/workflowsCreate", {
           owner: data.owner,
           repo: data.repo,
         });
       }
-      if (dayjs().isSame(dayjs(data.repoData.runsSyncDate))) {
+      if (
+        !data.repoData?.runsSyncDate ||
+        dayjs().isSame(dayjs(data.repoData?.runsSyncDate))
+      ) {
         await axios.post("http://localhost:3000/workflowrunsCreate", {
           owner: data.owner,
           repo: data.repo,
         });
       }
-      setId(data.workflows[0].id);
+      setId(data.workflows[0]?.id);
     };
 
     fetchData();
