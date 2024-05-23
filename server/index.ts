@@ -149,15 +149,9 @@ duration = 30
       data: newWorkflowRuns,
     });
   
-    if (repoData.length === 0) {
 
-      await prisma.repo.create({
-        data: {
-          repo: owner + "/" + repo,
-          runsSyncDate: dayjs().toISOString(),
-        },
-      });
-    } else {
+    
+   
       await prisma.repo.update({
         where: {
           repo: owner + "/" + repo,
@@ -166,7 +160,6 @@ duration = 30
           runsSyncDate: dayjs().toISOString(),
         },
       });
-    }
     return newWorkflowRuns;
   } catch (err) {
     console.log(err);
